@@ -25,7 +25,7 @@ Before running any scripts, ensure a virtual environment exists and dependencies
 ```bash
 python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
-If `.venv/` already exists, just activate it:
+If `.venv/` already exists, just activate it (Take note the correct path is just .venv/, not /.venv/ as the folder is at the root of the working directory):
 ```bash
 .venv/bin/activate
 ```
