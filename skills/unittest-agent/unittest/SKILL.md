@@ -1,49 +1,54 @@
 ---
 name: unittest
-description: Write a self-contained Python unit test script for the backtest.py file. Produces test_backtest.py with unit tests for the Strategy class, data download, signal generation, PnL calculation, and performance reporting.
+description: Write a self-contained Python unit test script for the customtradingstrategy.py file. Produces test_customtradingstrategy.py with unit tests for the Strategy class, then runs the tests and writes results to unittest_report.txt.
 ---
-
-# Unit Test Skill — Backtest Script Testing
+# Unit Test Skill — Custom Trading Strategy Unit Testing
 
 ## Input
-Read backtest.py from the working directory — it contains the Strategy class.
+Read customstrategy/customtradingstrategy.py from the working directory — it contains the Strategy class.
 
 ## Output
-If the file test_backtest.py does not already exist in the workspace:
-Write a single Python script to test_backtest.py using write_file.
+If the file test_customtradingstrategy.py does not already exist in the workspace:
+Write a single Python script to test_customtradingstrategy.py using write_file tool.
 The script should use the unittest framework to define test cases for the Strategy class and its methods.
 
-If the file test_backtest.py already exists:
+If the file test_customtradingstrategy.py already exists:
 That means this agent has already been run once, and the test script is in place. In this case, skip writing the file and proceed to running the tests.
 
 In either case, executing the tests will produce a file named `unittest_report.txt`, which contains the results of running the unit tests.
+
+## Prerequisites
+
+### Python environment setup
+
+Before running any scripts, ensure a virtual environment exists and dependencies are installed:
+```bash
+python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
+```
+If `.venv/` already exists, just activate it:
+```bash
+.venv/bin/activate
+```
 
 ## Procedure
 
 Follow these steps in order:
 
 **STEP 1 — Write the test file**
-Read backtest.py, then write (or update) test_backtest.py following the Code Structure below.
+Read customstrategy/customtradingstrategy.py, then write test_customtradingstrategy.py following the Code Structure below.
 
 **STEP 2 — Format the test file**
-Call the `ruff_format` tool with `file_path` set to `"test_backtest.py"`.
+Call the `ruff_format` tool with `file_path` set to `"test_customtradingstrategy.py"`.
 If it reports any errors, fix them and re-run `ruff_format` until the file is clean.
 
 **STEP 3 — Set up the environment and run the tests**
 Execute the following bash command in sequence:
 
 ```bash
-python3 -m venv env && env/bin/pip install -r requirements.txt && env/bin/python3 test_backtest.py
+.venv/bin/python3.12 test_customtradingstrategy.py
 ```
 
-**STEP 4 — Tear down the virtual environment**
-Always remove the virtual environment before returning control:
-
-```bash
-rm -rf env
-```
-
-**STEP 5 — Stop**
+**STEP 4 — Stop**
 Do **not** attempt to fix or modify the test script based on test results. Whether the tests pass or fail, your job is done once the tests have been executed and the report written.
 Respond with only: "Done." The orchestrator reads unittest_report.txt to determine pass/fail.
 
@@ -51,7 +56,7 @@ Respond with only: "Done." The orchestrator reads unittest_report.txt to determi
 The script must have 3 parts:
 
 ### Part 1: Imports
-All necessary imports (unittest, the Strategy class from backtest, and any dependencies).
+All necessary imports (unittest, the Strategy class from customstrategy.customtradingstrategy, and any dependencies).
 
 ### Part 2: Test Class
 A single test class inheriting from `unittest.TestCase` with one `setUp` method and multiple `test_*` methods.
