@@ -44,12 +44,12 @@ Run `fetch_data.py` from the project root directory.
 
 **Single ticker:**
 ```bash
-python fetch_data.py -s AAPL -p 2y
+.venv/bin/python fetch_data.py -s AAPL -p 2y
 ```
 
 **Multiple tickers (space-separated, NOT comma-separated):**
 ```bash
-python fetch_data.py -s PIN FXI EWI EWW EZA EWT EWJ IVV EWU EZU EWA EWS EWC EIS EWZ -p 2y
+.venv/bin/python fetch_data.py -s PIN FXI EWI EWW EZA EWT EWJ IVV EWU EZU EWA EWS EWC EIS EWZ -p 2y
 ```
 
 ### CLI options
@@ -97,7 +97,7 @@ Run `backtest.py` from the project root directory. (All parameters read from `se
 
 **Single-asset strategy or multi-asset strategy:**
 ```bash
-python backtest.py --strategy custom_trading_strategy
+.venv/bin/python backtest.py --strategy custom_trading_strategy
 ```
 
 ### CLI options
