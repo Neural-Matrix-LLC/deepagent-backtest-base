@@ -1,0 +1,35 @@
+# Backtesting Configuration
+# Copy to settings.yaml and customize
+
+# Data source settings
+data:
+  provider: yfinance    # Options: yfinance, coingecko
+  cache_dir: ./data     # Where to cache downloaded data
+  default_interval: 1d  # Default bar interval
+
+# Backtest execution settings
+backtest:
+  default_capital: 10000   # Starting capital in USD
+  commission: 0.001        # Commission per trade (0.1%)
+  slippage: 0.0005         # Slippage per trade (0.05%)
+  period: 2y            # Backtest period (e.g. 1y, 6mo, 2020-01-01:2021-01-01)
+
+# Risk management (optional)
+risk:
+  max_position_size: 0.95  # Max % of capital per position
+  stop_loss: null          # Fixed stop loss % (null = disabled)
+  take_profit: null        # Fixed take profit % (null = disabled)
+
+# Report generation
+reporting:
+  output_dir: ./reports    # Where to save results
+  save_trades: true        # Save trade log CSV
+  save_equity: true        # Save equity curve CSV
+  save_chart: true         # Generate equity chart PNG
+
+# Strategy defaults (can be overridden via --params)
+custom_trading_strategy:
+  multi_asset: true # Whether the strategy is multi-asset (true) or single-asset (false)
+  tickers: # use array for single or multiple tickers
+  params: # strategy-specific parameters (e.g. SMA periods, RSI thresholds)
+  
