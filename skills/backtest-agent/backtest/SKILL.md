@@ -113,6 +113,11 @@ Confirm results:
 ```bash
 ls reports/
 ```
+## Step 5: Remove virtual environment
 
+After verifying the backtest results, clean up by removing the virtual environment:
+```bash
+rm -rf .venv
+```
 
 
