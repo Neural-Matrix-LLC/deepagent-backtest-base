@@ -428,8 +428,14 @@ def main():
     backtest_settings = settings.get('backtest', {})
     risk_settings = settings.get('risk', {})
     is_multi_asset = settings.get('custom_trading_strategy', {}).get('multi_asset', False)
+    if not is_multi_asset:
+        is_multi_asset = False  # Ensure it's a boolean
     tickers = settings.get('custom_trading_strategy', {}).get('tickers', [])
+    if not tickers:
+        tickers = []
     params = settings.get('custom_trading_strategy', {}).get('params', {})
+    if not params:
+        params = {}
     params['tickers'] = tickers  # Ensure tickers are in params for strategy
 
     capital = backtest_settings.get('default_capital', 10000)
