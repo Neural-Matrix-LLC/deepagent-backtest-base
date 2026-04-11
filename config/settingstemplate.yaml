@@ -32,4 +32,6 @@ custom_trading_strategy:
   multi_asset: true # Whether the strategy is multi-asset (true) or single-asset (false)
   tickers: # use array for single or multiple tickers
   params: # strategy-specific parameters (e.g. SMA periods, RSI thresholds)
+    param1: value1
+    param2: value2
   

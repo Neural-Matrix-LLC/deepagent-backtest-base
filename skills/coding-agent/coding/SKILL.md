@@ -16,9 +16,9 @@ You will create two files only:
 — use customstrategy/strategytemplate.py as a starting point
 — the class name must be `CustomTradingStrategy` and it must inherit from `Strategy` in strategies.py
 2. `config/settings.yaml`
- — trading strategy parameters under the `custom_trading_strategy:` key
- — use config/settingstemplate.yaml as a starting point
- — hint: try extract threshold values in your code as tunable parameters and add them to settings.yaml
+ — use config/settingstemplate.yaml as a starting point, only edit the `custom_trading_strategy` key
+ — mandatory keys for `custom_trading_strategy`: `multi_asset` (bool), `tickers` (list of tickers), `params` (dict of strategy-specific parameters)
+ — try extract threshold values in your code as tunable parameters and add them under the `params` key
 
 **All other files in the workspace are irrelevant. Do NOT read, edit, or create any other files.**
 
