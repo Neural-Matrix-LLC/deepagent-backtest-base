@@ -69,11 +69,7 @@ Data is cached as `{TICKER}_{interval}.csv` in the data directory. For multiple 
 If `fetch_data.py` raises any exception, capture the full error message **and** traceback into `backtest_error.txt`.
 Use a command like:
 ```bash
-python fetch_data.py -s AAPL -p 2y 2>&1 || python -c "
-import traceback, sys
-with open('backtest_error.txt','w') as f:
-    f.write(open('/dev/stdin').read())
-" 
+.venv/bin/python fetch_data.py -s AAPL -p 2y > backtest_result.txt 2> backtest_error.txt
 ```
 
 If `backtest_error.txt` is produced at this stage, **STOP immediately** — do NOT proceed to run `backtest.py`. Your task is done.
@@ -91,19 +87,13 @@ Run `backtest.py` from the project root directory. (All parameters read from `se
 
 **Single-asset strategy or multi-asset strategy:**
 ```bash
-.venv/bin/python backtest.py --strategy custom_trading_strategy
+.venv/bin/python backtest.py --strategy custom_trading_strategy > backtest_result.txt 2> backtest_error.txt
 ```
 
 ### Error handling for backtest.py
 
-If `backtest.py` raises any exception, capture the full error message **and** traceback into `backtest_error.txt`.
-Wrap the call so stderr+stdout are captured:
-```bash
-.venv/bin/python backtest.py --strategy custom_trading_strategy > /tmp/backtest_output.txt 2>&1
-if [ $? -ne 0 ]; then
-  cp /tmp/backtest_output.txt backtest_error.txt
-fi
-```
+If `backtest.py` raises any exception, the above bash command will capture the full error message **and** traceback into `backtest_error.txt`.
+
 If `backtest_error.txt` is produced, **STOP immediately**. 
 Your task is done — DO NOT try to look into the code to fix it yourself; the debugging agent will handle the fix.
 
