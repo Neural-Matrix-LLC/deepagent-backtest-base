@@ -8,6 +8,7 @@ import pandas as pd
 import yaml
 import argparse
 import sys
+import traceback
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
@@ -418,97 +419,103 @@ def save_results(result: BacktestResult, output_dir: Path) -> None:
     print(f"Results saved to: {output_dir}")
 
 def main():
-    parser = argparse.ArgumentParser(description='Backtest trading strategies')
-    parser.add_argument('--strategy', '-s', required=True, help='Strategy name')
-    args = parser.parse_args()
-
     script_dir = Path(__file__).parent
-    settings = load_settings(script_dir)
 
-    backtest_settings = settings.get('backtest', {})
-    risk_settings = settings.get('risk', {})
-    is_multi_asset = settings.get('custom_trading_strategy', {}).get('multi_asset', False)
-    if not is_multi_asset:
-        is_multi_asset = False  # Ensure it's a boolean
-    tickers = settings.get('custom_trading_strategy', {}).get('tickers', [])
-    if not tickers:
-        tickers = []
-    params = settings.get('custom_trading_strategy', {}).get('params', {})
-    if not params:
-        params = {}
-    params['tickers'] = tickers  # Ensure tickers are in params for strategy
+    try:
+        parser = argparse.ArgumentParser(description='Backtest trading strategies')
+        parser.add_argument('--strategy', '-s', required=True, help='Strategy name')
+        args = parser.parse_args()
 
-    capital = backtest_settings.get('default_capital', 10000)
-    commission = backtest_settings.get('commission', 0.001)
-    slippage = backtest_settings.get('slippage', 0.0005)
+        settings = load_settings(script_dir)
+        backtest_settings = settings.get('backtest', {})
+        risk_settings = settings.get('risk', {})
+        is_multi_asset = settings.get('custom_trading_strategy', {}).get('multi_asset', False)
+        if not is_multi_asset:
+            is_multi_asset = False  # Ensure it's a boolean
+        tickers = settings.get('custom_trading_strategy', {}).get('tickers', [])
+        if not tickers:
+            tickers = []
+        params = settings.get('custom_trading_strategy', {}).get('params', {})
+        if not params:
+            params = {}
+        params['tickers'] = tickers  # Ensure tickers are in params for strategy
 
-    # Determine date range
-    if backtest_settings.get('period'):
-        end = datetime.now()
-        start = end - parse_period(backtest_settings.get('period'))
-    else:
-        end = datetime.now()
-        start = end - timedelta(days=365)
+        capital = backtest_settings.get('default_capital', 10000)
+        commission = backtest_settings.get('commission', 0.001)
+        slippage = backtest_settings.get('slippage', 0.0005)
 
-    # Set up directories
-    data_dir = script_dir / 'data'
-    output_dir = script_dir / 'reports'
+        # Determine date range
+        if backtest_settings.get('period'):
+            end = datetime.now()
+            start = end - parse_period(backtest_settings.get('period'))
+        else:
+            end = datetime.now()
+            start = end - timedelta(days=365)
 
-    if is_multi_asset:
-        # Multi-asset strategy
-        if len(tickers) == 0:
-            print("Error: No symbols specified and strategy has no default ticker list.")
-            sys.exit(1)
-        symbol_label = ','.join(tickers)
-        data = load_multi_data(tickers, start, end, data_dir)
-        data.attrs['symbol'] = symbol_label
+        # Set up directories
+        data_dir = script_dir / 'data'
+        output_dir = script_dir / 'reports'
 
-        if len(data) < 50:
-            print(f"Error: Insufficient data. Got {len(data)} bars, need at least 50.")
-            sys.exit(1)
+        if is_multi_asset:
+            # Multi-asset strategy
+            if len(tickers) == 0:
+                print("Error: No symbols specified and strategy has no default ticker list.")
+                sys.exit(1)
+            symbol_label = ','.join(tickers)
+            data = load_multi_data(tickers, start, end, data_dir)
+            data.attrs['symbol'] = symbol_label
 
-        result = run_multi_backtest(
-            strategy_name=args.strategy,
-            data=data,
-            tickers=tickers,
-            initial_capital=capital,
-            params=params,
-            commission=commission,
-            slippage=slippage,
-        )
-    else:
-        # Single-asset strategy
-        symbol = tickers[0]
-        if symbol is None:
-            print("Error: No symbol specified and strategy has no default ticker.")
-            sys.exit(1)
+            if len(data) < 50:
+                print(f"Error: Insufficient data. Got {len(data)} bars, need at least 50.")
+                sys.exit(1)
 
-        data = load_data(symbol, start, end, data_dir)
-        data.attrs['symbol'] = symbol
+            result = run_multi_backtest(
+                strategy_name=args.strategy,
+                data=data,
+                tickers=tickers,
+                initial_capital=capital,
+                params=params,
+                commission=commission,
+                slippage=slippage,
+            )
+        else:
+            # Single-asset strategy
+            symbol = tickers[0]
+            if symbol is None:
+                print("Error: No symbol specified and strategy has no default ticker.")
+                sys.exit(1)
 
-        if len(data) < 50:
-            print(f"Error: Insufficient data. Got {len(data)} bars, need at least 50.")
-            sys.exit(1)
+            data = load_data(symbol, start, end, data_dir)
+            data.attrs['symbol'] = symbol
 
-        result = run_backtest(
-            strategy_name=args.strategy,
-            data=data,
-            initial_capital=capital,
-            params=params,
-            commission=commission,
-            slippage=slippage,
-            risk_settings=risk_settings,
-        )
+            if len(data) < 50:
+                print(f"Error: Insufficient data. Got {len(data)} bars, need at least 50.")
+                sys.exit(1)
 
-    # Print results
-    print(format_results(result))
+            result = run_backtest(
+                strategy_name=args.strategy,
+                data=data,
+                initial_capital=capital,
+                params=params,
+                commission=commission,
+                slippage=slippage,
+                risk_settings=risk_settings,
+            )
 
-    # Save results
-    save_results(result, output_dir)
+        # Print results
+        print(format_results(result))
 
-    # Write success marker
-    success_file = script_dir / 'backtest_success.txt'
-    success_file.write_text('success')
+        # Save results
+        save_results(result, output_dir)
+
+        # Write success marker
+        success_file = script_dir / 'backtest_success.txt'
+        success_file.write_text('success')
+    except Exception as e:
+        error_file = script_dir / 'backtest_error.txt'
+        error_details = traceback.format_exc()
+        error_file.write_text(str(e) + "\n\n" + error_details)
+    
 
 if __name__ == '__main__':
     main()

@@ -12,6 +12,7 @@ import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
 import sys
+import traceback
 
 
 def parse_period(period: str) -> timedelta:
@@ -67,61 +68,66 @@ def fetch_yfinance(symbol: str | list[str], start: datetime, end: datetime, inte
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Fetch historical price data')
-    parser.add_argument('--symbol', '-s', required=True, nargs='+', help='Trading symbol(s)')
-    parser.add_argument('--period', '-p', help='Lookback period (e.g., 2y, 6m)')
-    parser.add_argument('--start', help='Start date (YYYY-MM-DD)')
-    parser.add_argument('--end', help='End date (YYYY-MM-DD)')
-    parser.add_argument('--interval', '-i', default='1d', help='Data interval (1d, 1h, etc.)')
-    parser.add_argument('--source', default='yfinance', choices=['yfinance'])
-    parser.add_argument('--output', '-o', help='Output directory')
-    
-    args = parser.parse_args()
-    symbols = args.symbol if len(args.symbol) > 1 else args.symbol[0]
-    
-    # Determine date range
-    if args.start and args.end:
-        start = datetime.strptime(args.start, '%Y-%m-%d')
-        end = datetime.strptime(args.end, '%Y-%m-%d')
-    elif args.period:
-        end = datetime.now()
-        start = end - parse_period(args.period)
-    else:
-        end = datetime.now()
-        start = end - timedelta(days=730)  # 2 years default
-    
-    # Fetch data
-    df = fetch_yfinance(symbols, start, end, args.interval)
-    
-    # Save to file(s)
-    script_dir = Path(__file__).parent
-    output_dir = Path(args.output) if args.output else script_dir / 'data'
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    if isinstance(symbols, list):
-        for sym in symbols:
-            suffix = f"_{sym}"
-            sym_cols = [c for c in df.columns if c.endswith(suffix)]
-            sym_df = df[sym_cols].rename(columns={c: c.replace(suffix, '') for c in sym_cols})
-            
-            filename = f"{sym.replace('/', '_').replace('-', '_')}_{args.interval}.csv"
+    try:
+        parser = argparse.ArgumentParser(description='Fetch historical price data')
+        parser.add_argument('--symbol', '-s', required=True, nargs='+', help='Trading symbol(s)')
+        parser.add_argument('--period', '-p', help='Lookback period (e.g., 2y, 6m)')
+        parser.add_argument('--start', help='Start date (YYYY-MM-DD)')
+        parser.add_argument('--end', help='End date (YYYY-MM-DD)')
+        parser.add_argument('--interval', '-i', default='1d', help='Data interval (1d, 1h, etc.)')
+        parser.add_argument('--source', default='yfinance', choices=['yfinance'])
+        parser.add_argument('--output', '-o', help='Output directory')
+        
+        args = parser.parse_args()
+        symbols = args.symbol if len(args.symbol) > 1 else args.symbol[0]
+        
+        # Determine date range
+        if args.start and args.end:
+            start = datetime.strptime(args.start, '%Y-%m-%d')
+            end = datetime.strptime(args.end, '%Y-%m-%d')
+        elif args.period:
+            end = datetime.now()
+            start = end - parse_period(args.period)
+        else:
+            end = datetime.now()
+            start = end - timedelta(days=730)  # 2 years default
+        
+        # Fetch data
+        df = fetch_yfinance(symbols, start, end, args.interval)
+        
+        # Save to file(s)
+        script_dir = Path(__file__).parent
+        output_dir = Path(args.output) if args.output else script_dir / 'data'
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        if isinstance(symbols, list):
+            for sym in symbols:
+                suffix = f"_{sym}"
+                sym_cols = [c for c in df.columns if c.endswith(suffix)]
+                sym_df = df[sym_cols].rename(columns={c: c.replace(suffix, '') for c in sym_cols})
+                
+                filename = f"{sym.replace('/', '_').replace('-', '_')}_{args.interval}.csv"
+                output_file = output_dir / filename
+                sym_df.to_csv(output_file)
+                
+                print(f"Data saved to: {output_file}")
+                print(f"  Rows: {len(sym_df)}")
+                print(f"  Date range: {df.index[0]} to {df.index[-1]}")
+                print(f"  Columns: {list(sym_df.columns)}")
+        else:
+            filename = f"{symbols.replace('/', '_').replace('-', '_')}_{args.interval}.csv"
             output_file = output_dir / filename
-            sym_df.to_csv(output_file)
+            df.to_csv(output_file)
             
             print(f"Data saved to: {output_file}")
-            print(f"  Rows: {len(sym_df)}")
+            print(f"  Rows: {len(df)}")
             print(f"  Date range: {df.index[0]} to {df.index[-1]}")
-            print(f"  Columns: {list(sym_df.columns)}")
-    else:
-        filename = f"{symbols.replace('/', '_').replace('-', '_')}_{args.interval}.csv"
-        output_file = output_dir / filename
-        df.to_csv(output_file)
-        
-        print(f"Data saved to: {output_file}")
-        print(f"  Rows: {len(df)}")
-        print(f"  Date range: {df.index[0]} to {df.index[-1]}")
-        print(f"  Columns: {list(df.columns)}")
-
+            print(f"  Columns: {list(df.columns)}")
+    except Exception as e:
+        script_dir = Path(__file__).parent
+        error_file = script_dir / 'backtest_error.txt'
+        error_details = traceback.format_exc()
+        error_file.write_text(str(e) + "\n\n" + error_details)
 
 if __name__ == '__main__':
     main()
