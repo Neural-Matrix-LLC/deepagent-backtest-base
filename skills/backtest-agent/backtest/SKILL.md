@@ -72,7 +72,8 @@ Use a command like:
 .venv/bin/python fetch_data.py -s AAPL -p 2y
 ```
 
-If `backtest_error.txt` is produced at this stage, **STOP immediately** — do NOT proceed to run `backtest.py`. Your task is done.
+If `backtest_error.txt` is produced at this stage, **STOP immediately** — do NOT proceed to run `backtest.py`. 
+Your task is done. Leave the virtual environment intact.
 
 ### Verify
 
@@ -96,6 +97,7 @@ If `backtest.py` raises any exception, error message **and** traceback will be w
 
 If `backtest_error.txt` is produced, **STOP immediately**. 
 Your task is done — DO NOT try to look into the code to fix it yourself; the debugging agent will handle the fix.
+Leave the virtual environment intact.
 
 
 ## Step 4: Verify output
