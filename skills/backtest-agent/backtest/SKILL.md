@@ -75,13 +75,7 @@ with open('backtest_error.txt','w') as f:
     f.write(open('/dev/stdin').read())
 " 
 ```
-Or, more reliably, wrap the call so stderr+stdout are captured:
-```bash
-python fetch_data.py -s AAPL -p 2y > /tmp/fetch_output.txt 2>&1
-if [ $? -ne 0 ]; then
-  cp /tmp/fetch_output.txt backtest_error.txt
-fi
-```
+
 If `backtest_error.txt` is produced at this stage, **STOP immediately** — do NOT proceed to run `backtest.py`. Your task is done.
 
 ### Verify
@@ -100,29 +94,18 @@ Run `backtest.py` from the project root directory. (All parameters read from `se
 .venv/bin/python backtest.py --strategy custom_trading_strategy
 ```
 
-### CLI options
-
-| Flag | Description | Default |
-|---|---|---|
-| `--strategy` / `-s` | Strategy name from `STRATEGIES` dict (required) | — |
-
 ### Error handling for backtest.py
 
 If `backtest.py` raises any exception, capture the full error message **and** traceback into `backtest_error.txt`.
 Wrap the call so stderr+stdout are captured:
 ```bash
-python backtest.py --strategy custom_trading_strategy --symbol AAPL --period 2y > /tmp/backtest_output.txt 2>&1
+.venv/bin/python backtest.py --strategy custom_trading_strategy > /tmp/backtest_output.txt 2>&1
 if [ $? -ne 0 ]; then
   cp /tmp/backtest_output.txt backtest_error.txt
 fi
 ```
-If `backtest_error.txt` is produced, **STOP immediately**. Your task is done — the debugging agent will handle the fix.
-
-### Routing
-
-The engine auto-routes based on the strategy's `multi_asset` attribute:
-- `multi_asset = False` → `run_backtest()` — bar-by-bar simulation with stop-loss/take-profit.
-- `multi_asset = True` → `run_multi_backtest()` — vectorized portfolio simulation, equal-weighted positions.
+If `backtest_error.txt` is produced, **STOP immediately**. 
+Your task is done — DO NOT try to look into the code to fix it yourself; the debugging agent will handle the fix.
 
 
 ## Step 4: Verify output
@@ -141,18 +124,5 @@ Confirm results:
 ls reports/
 ```
 
-Read the summary to verify the backtest completed successfully:
-```bash
-cat reports/*_summary.txt | tail -1
-```
 
-## Error Handling
-
-| Error | Cause | Fix |
-|---|---|---|
-| `Unknown strategy: X` | Strategy not registered | Code agent must add it to `STRATEGIES` dict |
-| `No data returned for X` | Invalid ticker or no market data | Check ticker symbol spelling |
-| `Insufficient data. Got N bars` | Too few bars for strategy lookback | Use a longer `--period` |
-| `--symbol is required` | Single-asset strategy needs a ticker | Pass `--symbol TICK` |
-| `AttributeError: 'Index' ... 'tz'` | Stale cached CSV | Delete the CSV in `data/` and re-fetch |
 
