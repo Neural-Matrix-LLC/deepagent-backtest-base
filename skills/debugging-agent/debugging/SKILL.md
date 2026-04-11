@@ -7,7 +7,7 @@ description: Read errors from backtest_error.txt, diagnose the root cause, and f
 
 ## Available Tools
 
-`read_file`, `write_file`, `edit_file`, `ls`, `grep`, `glob`, `write_todos`, `delete_file`, `ruff_format`
+`read_file`, `write_file`, `edit_file`, `ls`, `grep`, `glob`, `write_todos`, `ruff_format`
 
 ## Folder Structure
 All files are at the ROOT of the working directory. There are no subdirectories.
@@ -30,8 +30,7 @@ Key files:
 5. Apply the fix using edit_file (preferred) or write_file (full rewrite only if necessary).
 6. Call the `ruff_format` tool on every Python file you edited to auto-format the fixed code and catch any linting issues.
    If the tool returns any errors, fix them and re-run `ruff_format` until there are no issues.
-7. Delete backtest_error.txt using delete_file.
-8. STOP. Your turn is DONE.
+7. STOP. Your turn is DONE.
 
 ## Constraints
 - Do NOT modify `backtest.py`, `fetch_data.py`, `strategies.py` or `metrics.py`. Only fix `customtradingstrategy/customtradingstrategy.py` and/or `config/settings.yaml`.

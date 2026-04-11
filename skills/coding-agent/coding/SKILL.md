@@ -5,7 +5,7 @@ description: Implement a new trading strategy from a `strategy.json` specificati
 
 ## Available Tools
 
-`read_file`, `edit_file`, `ls`, `grep`, `glob`, `write_todos`, `delete_file`, `ruff_format`, `write_file`
+`read_file`, `edit_file`, `ls`, `grep`, `glob`, `write_todos`, `ruff_format`, `write_file`
 
 ## Scope — TWO files only
 
