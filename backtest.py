@@ -8,6 +8,7 @@ import pandas as pd
 import yaml
 import argparse
 import sys
+import os
 import traceback
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -420,6 +421,11 @@ def save_results(result: BacktestResult, output_dir: Path) -> None:
 
 def main():
     script_dir = Path(__file__).parent
+
+    if os.path.exists(script_dir / 'backtest_error.txt'):
+        os.remove(script_dir / 'backtest_error.txt')
+    if os.path.exists(script_dir / 'backtest_success.txt'):
+        os.remove(script_dir / 'backtest_success.txt')
 
     try:
         parser = argparse.ArgumentParser(description='Backtest trading strategies')
